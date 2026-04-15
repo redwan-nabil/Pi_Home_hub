@@ -131,25 +131,6 @@ Copy the code from the `telegram-notify.service` file in this repository and pas
 Save and exit (Ctrl+X, then Y, then Enter).
 
 
-### Step 5: Activate the Server
-Tell Linux that new "hardware" has been installed, lock it into the boot sequence, and turn it on permanently:
-
-1. Tell Linux to refresh its service list
-```
-sudo systemctl daemon-reload
-```
-2. Enable the bot to start automatically every time the Pi boots
-```
-sudo systemctl enable telegram-notify.service
-```
-3. Start the bot right now!
-```
-sudo systemctl start telegram-notify.service
-```
-
-You should instantly receive a "🟢 RASPBERRY PI ONLINE" message on your telegram bot!
-
-
 ### Step 5: Install and Activate the Server
 Move the service file to the Linux system directory, lock it into the boot sequence, and turn it on permanently. Run these commands one by one:
 
