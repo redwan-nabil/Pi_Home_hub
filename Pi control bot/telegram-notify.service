@@ -1,0 +1,23 @@
+[Unit]
+Description=Telegram Boot Notifier and Admin Control Bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+WorkingDirectory=/home/redwannabil
+Type=simple
+
+# Send the Boot Alert (The '-' means ignore errors if Wi-Fi is slow to connect)
+ExecStartPre=-/usr/local/bin/pi_alert "🟢 RASPBERRY PI ONLINE: The system has just booted up."
+
+# Run the Bot as Root so it has permission to shut down the Pi
+ExecStart=/usr/bin/python3 /home/redwannabil/pi_control_bot.py
+
+# Send the Shutdown Alert when the system powers off
+ExecStop=-/usr/local/bin/pi_alert "🔴 RASPBERRY PI OFFLINE: The system is shutting down."
+
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
