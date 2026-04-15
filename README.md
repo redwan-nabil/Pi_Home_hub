@@ -170,3 +170,190 @@ To stop the bot manually:
 ```
 sudo systemctl stop telegram-notify.service
 ```
+
+---
+
+## 💾 Automated Raspberry Pi Backup (SD → USB → Google Drive)
+
+This project includes an optional “full SD card image” backup system that:
+
+1. Creates a compressed image of your SD card (`dd` + `pigz`)
+2. Saves it to an external USB drive
+3. Uploads it to Google Drive using `rclone`
+4. Sends Telegram notifications on start/success/failure
+
+### 📁 Where to put the backup README
+
+Place the detailed reference document here (recommended):
+
+- `docs/backup/README.md`
+
+And link to it from this main README (example link path):
+
+- `docs/backup/README.md`
+
+### 🧩 Architecture Overview
+
+```
+┌──────────────┐       dd + pigz        ┌──────────────────┐
+│  SD Card     │ ─────────────────────▶  │  USB Drive       │
+│ /dev/mmcblk0 │                         │ /mnt/usb_backup  │
+└──────────────┘                         └──────┬───────────┘
+                                                │  rclone copy
+                                                ▼
+                                         ┌──────────────────┐
+                                         │  Google Drive     │
+                                         │  pi_backups/      │
+                                         └──────────────────┘
+
+Telegram notifications are sent at:
+  🔄 Backup start
+  ✅ Backup success (with file size and duration)
+  ❌ Backup failure (with error context)
+```
+
+### ⚙️ Script Configuration Reference
+
+All configuration lives at the top of:
+
+- `scripts/auto_backup.sh`
+
+| Variable | Default | Description |
+|---|---|---|
+| `SOURCE_DEVICE` | `/dev/mmcblk0` | Block device to image (your SD card) |
+| `USB_MOUNT` | `/mnt/usb_backup` | Mount point of external USB drive |
+| `LOCAL_BACKUP_DIR` | `${USB_MOUNT}/pi_backups` | Folder on USB for backup images |
+| `RCLONE_REMOTE` | `gdrive` | Name of your rclone remote |
+| `CLOUD_BACKUP_DIR` | `pi_backups` | Folder on Google Drive |
+| `LOCAL_RETENTION_DAYS` | `30` | Auto-delete local backups older than N days |
+| `CLOUD_RETENTION_DAYS` | `60` | Auto-delete cloud backups older than N days |
+| `LOG_FILE` | `/var/log/pi_backup.log` | Path to log file |
+| `SECRETS_FILE` | `~/.backup_secrets` | Path to file with Telegram credentials |
+
+### 🔐 Secrets File Format
+
+Create `~/.backup_secrets` with:
+
+```bash
+BACKUP_BOT_TOKEN="123456:ABC-your-token-here"
+BACKUP_CHAT_ID="your_numeric_chat_id"
+```
+
+Then lock it down:
+
+```bash
+chmod 600 ~/.backup_secrets
+```
+
+> **⚠️ Never commit this file to Git.** Your `.gitignore` should exclude it.
+
+### ♻️ Restore Procedure (Write image to a new SD card)
+
+1. Insert the new SD card into a PC/Mac/other Pi.
+2. Find the device name (`/dev/sdX` or `/dev/mmcblk0`):
+   ```bash
+   lsblk
+   ```
+3. Decompress and write:
+   ```bash
+   sudo gunzip -c /mnt/usb_backup/pi_backups/FILENAME.img.gz | sudo dd of=/dev/sdX bs=4M status=progress
+   ```
+4. Eject, insert into your Pi, and boot.
+
+### 🧯 Troubleshooting
+
+| Problem | Solution |
+|---|---|
+| `pigz: command not found` | `sudo apt install pigz` |
+| `rclone: command not found` | `sudo apt install rclone` |
+| USB drive not mounted | Check `lsblk` and re-mount; verify `/etc/fstab` |
+| rclone auth expired | Re-run `rclone config reconnect gdrive:` |
+| Telegram messages not arriving | Verify token/chat ID; test with `curl` manually |
+| Backup takes too long | Use `-1` (fast) compression; consider excluding boot partition |
+| Disk full on USB | Reduce `LOCAL_RETENTION_DAYS` or use a larger drive |
+
+
+# 🗑️ Auto-Empty Google Drive Trash (Daily)
+
+This guide sets up an automatic daily job that empties your **Google Drive Trash** using **Google Apps Script**.
+
+> This is useful if your backup workflow (e.g., via `rclone`) frequently deletes/overwrites files and you want to reclaim Google Drive space automatically.
+
+---
+
+## ✅ What this does
+
+- Runs a Google Apps Script function once per day
+- Permanently empties your Google Drive Trash
+
+---
+
+## 🧠 Script Code (Google Apps Script)
+
+Create a script with this function:
+
+```javascript
+function emptyMyTrash() {
+  Drive.Files.emptyTrash();
+}
+```
+
+---
+
+## 🛠️ Step-by-step Setup (Google Apps Script)
+
+### 1) Open Google Apps Script
+- In Google Drive: **New → More → Google Apps Script**
+- Or open Apps Script from the Google Workspace launcher.
+
+### 2) Create a new project
+- Name it something like: **Drive Trash Auto Empty**
+
+### 3) Enable the Advanced Drive Service (Required)
+`Drive.Files.emptyTrash()` requires enabling the **Advanced Drive Service**.
+
+In the Apps Script editor:
+
+1. Click **Services** (puzzle-piece icon or “+” icon on the left sidebar)
+2. Add **Drive API**
+3. Open **Project Settings** (gear icon) and make sure a **Google Cloud Platform project** is linked (Apps Script will guide you if needed)
+
+### 4) Paste the code
+- Open `Code.gs` (or create it if needed)
+- Paste the code:
+
+```javascript
+function emptyMyTrash() {
+  Drive.Files.emptyTrash();
+}
+```
+
+### 5) Run once manually (Authorize permissions)
+1. At the top toolbar, select function: **emptyMyTrash**
+2. Click **Run**
+3. Approve the permissions prompts (it needs access to manage your Drive)
+
+### 6) Create the daily trigger
+1. Left sidebar → **Triggers** (clock icon)
+2. Click **Add Trigger**
+3. Configure:
+   - **Choose which function to run:** `emptyMyTrash`
+   - **Select event source:** `Time-driven`
+   - **Select type of time based trigger:** `Day timer`
+   - Choose a time window (example: **03:00–04:00**)
+
+### 7) Confirm it’s working
+After it runs at least once:
+
+- Open Apps Script → **Executions** (or “Runs”) to see status
+- Check Google Drive → Trash should be empty after a successful run
+
+---
+
+## ⚠️ Notes / Warnings
+
+- This empties Trash for the **Google account that owns the Apps Script project** (the one you authorize with).
+- If your backups are stored in a **different Google account** or in a **Shared Drive**, you must create/authorize the script under that correct account (or use a different approach).
+- Emptying trash is **permanent** (cannot be undone).
+
+---
