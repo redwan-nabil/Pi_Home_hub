@@ -107,7 +107,7 @@ Paste this code inside (Replace YOUR_BOT_TOKEN and YOUR_CHAT_ID with your actual
 #!/bin/bash
 TOKEN="YOUR_BOT_TOKEN"
 CHAT_ID="YOUR_CHAT_ID"
-curl -s -X POST "[https://api.telegram.org/bot$TOKEN/sendMessage](https://api.telegram.org/bot$TOKEN/sendMessage)" -d chat_id="$CHAT_ID" -d text="$1" > /dev/null
+curl -s -X POST "https://api.telegram.org/bot$TOKEN/sendMessage" -d chat_id="$CHAT_ID" -d text="$1" > /dev/null
 ```
 
 Make it an executable command:
