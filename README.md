@@ -91,7 +91,7 @@ Important: Edit the BOT_TOKEN, ADMIN_ID, SENDER_EMAIL, EMAIL_APP_PASSWORD, and W
 
 Save and exit (Ctrl+X, then Y, then Enter).
 
-### Step 3: Create the Boot Alert Helper (pi_alert)
+### Step 3: Create the Boot Alert Helper (pi_alert) (optional but reliable)
 The service file relies on a small bash script to push boot/shutdown messages instantly to your phone. Let's create it in the system's local binaries folder:
 
 Open a new file:
