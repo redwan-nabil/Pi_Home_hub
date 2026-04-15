@@ -1,0 +1,38 @@
+# =============================================================================
+# .gitignore — Pi_Home_hub
+# =============================================================================
+
+# ----- Secrets & credentials (NEVER commit these) -----
+.env
+.env.*
+.backup_secrets
+*.secrets
+
+# ----- Logs -----
+*.log
+/var/log/pi_backup.log
+
+# ----- Backup images (large binary files) -----
+*.img
+*.img.gz
+*.img.xz
+
+# ----- Python -----
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ----- OS / Editor junk -----
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# ----- Node (if any tooling is added later) -----
+node_modules/
