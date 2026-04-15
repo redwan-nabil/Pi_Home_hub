@@ -64,9 +64,15 @@ This allows your Pi to check the live sky conditions over your house.
 
 ## 🚀 Installation & Setup Guide
 
-Run these commands on your Raspberry Pi terminal to implement the system from scratch.
+Since this is a lightweight, 2-file architecture, we will build the files directly on the Raspberry Pi rather than cloning the whole repository. 
 
-### Step 1: Clone the Repository
+Run these commands in your Raspberry Pi terminal to implement the system from scratch.
+
+### Step 1: Install Python Dependencies
+The bot requirres a few Python libraries to interact with Telegram and read system stats. Run:
 ```bash
-git clone [https://github.com/YOUR_USERNAME/YOUR_REPOSITORY_NAME.git](https://github.com/YOUR_USERNAME/YOUR_REPOSITORY_NAME.git)
-cd YOUR_REPOSITORY_NAME
+sudo apt update
+sudo apt install python3-pip -y
+pip3 install pyTelegramBotAPI psutil speedtest-cli requests
+
+
