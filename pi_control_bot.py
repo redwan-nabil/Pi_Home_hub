@@ -163,7 +163,7 @@ def is_admin_working():
 
 def is_admin_home():
     try:
-        subprocess.check_output(f"ping -c 2 -W 2 {PHONE_IP}", shell=True)
+        subprocess.check_output(f"ping -c 5 -W 2 {PHONE_IP}", shell=True)
         return True
     except subprocess.CalledProcessError:
         return False
