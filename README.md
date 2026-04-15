@@ -70,9 +70,118 @@ Run these commands in your Raspberry Pi terminal to implement the system from sc
 
 ### Step 1: Install Python Dependencies
 The bot requirres a few Python libraries to interact with Telegram and read system stats. Run:
-```bash
+
+```
 sudo apt update
 sudo apt install python3-pip -y
 pip3 install pyTelegramBotAPI psutil speedtest-cli requests
+```
 
+### Step 2: Create the Bot Script
+This is the main brain of the operation. We will create it in your home directory.
 
+Open a new file:
+
+```
+nano ~/pi_control_bot.py
+```
+Copy the Python code from the pi_control_bot.py file in this repository and paste it into the terminal.
+
+Important: Edit the BOT_TOKEN, ADMIN_ID, SENDER_EMAIL, EMAIL_APP_PASSWORD, and WEATHER_API_KEY variables with your actual credentials.
+
+Save and exit (Ctrl+X, then Y, then Enter).
+
+### Step 3: Create the Boot Alert Helper (pi_alert)
+The service file relies on a small bash script to push boot/shutdown messages instantly to your phone. Let's create it in the system's local binaries folder:
+
+Open a new file:
+```
+sudo nano /usr/local/bin/pi_alert
+```
+## Paste this code inside (Replace YOUR_BOT_TOKEN and YOUR_CHAT_ID with your actual Telegram details):
+
+```
+#!/bin/bash
+TOKEN="YOUR_BOT_TOKEN"
+CHAT_ID="YOUR_CHAT_ID"
+curl -s -X POST "[https://api.telegram.org/bot$TOKEN/sendMessage](https://api.telegram.org/bot$TOKEN/sendMessage)" -d chat_id="$CHAT_ID" -d text="$1" > /dev/null
+```
+
+# Make it an executable command:
+```
+sudo chmod +x /usr/local/bin/pi_alert
+```
+
+### Step 4: Create the Systemd Service
+Now we will create the configuration file that tells Linux to treat your bot like native hardware. We will put this directly into the system's core service folder.
+
+Open a new service file:
+
+```
+sudo nano /etc/systemd/system/telegram-notify.service
+```
+
+Copy the code from the `telegram-notify.service` file in this repository and paste it into the terminal.
+(Note: Ensure the `WorkingDirectory` and `ExecStart` paths in the code perfectly match the username on your Pi, e.g., `/home/username/`).
+
+Save and exit (Ctrl+X, then Y, then Enter).
+
+### Step 5: Activate the Server
+Tell Linux that new "hardware" has been installed, lock it into the boot sequence, and turn it on permanently:
+
+# 1. Tell Linux to refresh its service list
+```
+sudo systemctl daemon-reload
+```
+# 2. Enable the bot to start automatically every time the Pi boots
+```
+sudo systemctl enable telegram-notify.service
+```
+# 3. Start the bot right now!
+```
+sudo systemctl start telegram-notify.service
+```
+
+You should instantly receive a "🟢 RASPBERRY PI ONLINE" message on your telegram bot!
+
+### Step 5: Install and Activate the Server
+Move the service file to the Linux system directory, lock it into the boot sequence, and turn it on permanently. Run these commands one by one:
+
+```bash
+# 1. Copy the service file to the systemd folder
+sudo cp telegram-notify.service /etc/systemd/system/
+
+# 2. Tell Linux to refresh its service list
+sudo systemctl daemon-reload
+
+# 3. Enable the bot to start automatically every time the Pi boots
+sudo systemctl enable telegram-notify.service
+
+# 4. Start the bot right now!
+sudo systemctl start telegram-notify.service
+```
+
+### 📱 Bot Commands
+Send these commands to your bot in Telegram:
+
+`/performance` - Runs a diagnostic check and returns CPU, Temp, Power Draw, RAM, and Internet Speeds.
+
+`/reboot` - Triggers the 2FA lock. Upon entering the OTP, safely reboots the Pi.
+
+`/shutdown` - Triggers the 2FA lock. Upon entering the OTP, safely shuts down the Pi.
+
+`/clear cache` - Triggers the 2FA lock. Clears OS updates, temp PDF files, Linux journals, and RAM cache to free up space.
+
+🔍 Troubleshooting & Logs
+Because this runs as a native system service, you do not use standard text files for logs. Instead, use the official Linux journal tool.
+
+To view the live feed of the bot (and see any errors):
+```
+sudo journalctl -u telegram-notify.service -f
+```
+(Press Ctrl + C to exit the live log view)
+
+To stop the bot manually:
+```
+sudo systemctl stop telegram-notify.service
+```
