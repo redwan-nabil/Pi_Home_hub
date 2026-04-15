@@ -98,7 +98,7 @@ Open a new file:
 ```
 sudo nano /usr/local/bin/pi_alert
 ```
-## Paste this code inside (Replace YOUR_BOT_TOKEN and YOUR_CHAT_ID with your actual Telegram details):
+Paste this code inside (Replace YOUR_BOT_TOKEN and YOUR_CHAT_ID with your actual Telegram details):
 
 ```
 #!/bin/bash
@@ -107,7 +107,7 @@ CHAT_ID="YOUR_CHAT_ID"
 curl -s -X POST "[https://api.telegram.org/bot$TOKEN/sendMessage](https://api.telegram.org/bot$TOKEN/sendMessage)" -d chat_id="$CHAT_ID" -d text="$1" > /dev/null
 ```
 
-# Make it an executable command:
+Make it an executable command:
 ```
 sudo chmod +x /usr/local/bin/pi_alert
 ```
@@ -129,15 +129,15 @@ Save and exit (Ctrl+X, then Y, then Enter).
 ### Step 5: Activate the Server
 Tell Linux that new "hardware" has been installed, lock it into the boot sequence, and turn it on permanently:
 
-# 1. Tell Linux to refresh its service list
+1. Tell Linux to refresh its service list
 ```
 sudo systemctl daemon-reload
 ```
-# 2. Enable the bot to start automatically every time the Pi boots
+2. Enable the bot to start automatically every time the Pi boots
 ```
 sudo systemctl enable telegram-notify.service
 ```
-# 3. Start the bot right now!
+3. Start the bot right now!
 ```
 sudo systemctl start telegram-notify.service
 ```
@@ -172,7 +172,7 @@ Send these commands to your bot in Telegram:
 
 `/clear cache` - Triggers the 2FA lock. Clears OS updates, temp PDF files, Linux journals, and RAM cache to free up space.
 
-🔍 Troubleshooting & Logs
+### 🔍 Troubleshooting & Logs
 Because this runs as a native system service, you do not use standard text files for logs. Instead, use the official Linux journal tool.
 
 To view the live feed of the bot (and see any errors):
