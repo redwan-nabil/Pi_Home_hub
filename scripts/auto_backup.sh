@@ -141,13 +141,13 @@ main() {
     log "========================================"
     send_telegram "🔄 *Backup Started*%0AHost: \`${HOSTNAME_TAG}\`%0AFile: \`${BACKUP_FILENAME}\`"
 
-    local start_time
+    local start_time size
     start_time=$(date +%s)
+    size="unknown"
 
     # --- Step 1: Create compressed image ---
     log "Step 1/4: Creating compressed image from ${SOURCE_DEVICE}..."
     if dd if="$SOURCE_DEVICE" bs=4M status=none | pigz -1 > "$BACKUP_PATH"; then
-        local size
         size=$(du -h "$BACKUP_PATH" | cut -f1)
         log "  Image created: ${BACKUP_PATH} (${size})"
     else

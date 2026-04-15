@@ -468,12 +468,12 @@ Edit these values at the top of `auto_backup.sh` to match your storage capacity 
 | Action | Command |
 |---|---|
 | Run backup manually | `sudo /usr/local/bin/auto_backup.sh` |
-| Check timer status | `systemctl list-timers --all \| grep pi-backup` |
+| Check timer status | `systemctl list-timers --all` (look for pi-backup) |
 | View backup log | `sudo tail -f /var/log/pi_backup.log` |
 | List local backups | `ls -lh /mnt/usb_backup/pi_backups/` |
 | List cloud backups | `rclone ls gdrive:pi_backups/` |
 | Cancel a running backup | `sudo kill $(pgrep -f auto_backup)` |
-| Restore from backup | `sudo gunzip -c /mnt/usb_backup/pi_backups/FILENAME.img.gz \| sudo dd of=/dev/mmcblk0 bs=4M status=progress` |
+| Restore from backup | See [docs/backup.md](docs/backup.md#restore-procedure) for the full restore command |
 
 ---
 
