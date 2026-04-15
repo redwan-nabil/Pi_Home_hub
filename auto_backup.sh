@@ -1,10 +1,10 @@
 #!/bin/bash
-LOGFILE="/home/redwannabil/backup.log"
+LOGFILE="/home/username/backup.log"
 FILENAME="Pi_Backup_$(date +%Y%m%d).img.gz"
 
 # Telegram Credentials
-TOKEN="8656067869:AAFSea_-LngpR87IYf_iR6-iyxuqqJ8u_LI"
-CHAT_ID="1435882929"
+TOKEN="Add your telegram bot token"
+CHAT_ID="add your chat id"
 
 # Notification Function
 send_msg() {
