@@ -135,16 +135,14 @@ Save and exit (Ctrl+X, then Y, then Enter).
 Move the service file to the Linux system directory, lock it into the boot sequence, and turn it on permanently. Run these commands one by one:
 
 ```bash
-# 1. Copy the service file to the systemd folder
-sudo cp telegram-notify.service /etc/systemd/system/
 
-# 2. Tell Linux to refresh its service list
+# 1. Tell Linux to refresh its service list
 sudo systemctl daemon-reload
 
-# 3. Enable the bot to start automatically every time the Pi boots
+# 2. Enable the bot to start automatically every time the Pi boots
 sudo systemctl enable telegram-notify.service
 
-# 4. Start the bot right now!
+# 3. Start the bot right now!
 sudo systemctl start telegram-notify.service
 ```
 
