@@ -68,6 +68,7 @@ Since this is a lightweight, 2-file architecture, we will build the files direct
 
 Run these commands in your Raspberry Pi terminal to implement the system from scratch.
 
+
 ### Step 1: Install Python Dependencies
 The bot requirres a few Python libraries to interact with Telegram and read system stats. Run:
 
@@ -76,6 +77,7 @@ sudo apt update
 sudo apt install python3-pip -y
 pip3 install pyTelegramBotAPI psutil speedtest-cli requests
 ```
+
 
 ### Step 2: Create the Bot Script
 This is the main brain of the operation. We will create it in your home directory.
@@ -91,7 +93,8 @@ Important: Edit the BOT_TOKEN, ADMIN_ID, SENDER_EMAIL, EMAIL_APP_PASSWORD, and W
 
 Save and exit (Ctrl+X, then Y, then Enter).
 
-### Step 3: Create the Boot Alert Helper (pi_alert) (optional but reliable)
+
+### Step 3: Create the Boot Alert Helper (pi_alert)
 The service file relies on a small bash script to push boot/shutdown messages instantly to your phone. Let's create it in the system's local binaries folder:
 
 Open a new file:
@@ -112,6 +115,7 @@ Make it an executable command:
 sudo chmod +x /usr/local/bin/pi_alert
 ```
 
+
 ### Step 4: Create the Systemd Service
 Now we will create the configuration file that tells Linux to treat your bot like native hardware. We will put this directly into the system's core service folder.
 
@@ -125,6 +129,7 @@ Copy the code from the `telegram-notify.service` file in this repository and pas
 (Note: Ensure the `WorkingDirectory` and `ExecStart` paths in the code perfectly match the username on your Pi, e.g., `/home/username/`).
 
 Save and exit (Ctrl+X, then Y, then Enter).
+
 
 ### Step 5: Activate the Server
 Tell Linux that new "hardware" has been installed, lock it into the boot sequence, and turn it on permanently:
@@ -143,6 +148,7 @@ sudo systemctl start telegram-notify.service
 ```
 
 You should instantly receive a "🟢 RASPBERRY PI ONLINE" message on your telegram bot!
+
 
 ### Step 5: Install and Activate the Server
 Move the service file to the Linux system directory, lock it into the boot sequence, and turn it on permanently. Run these commands one by one:
