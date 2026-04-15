@@ -36,13 +36,13 @@ This is the unique password that allows your Python script to control a Telegram
 3. Send the command: `/newbot`
 4. Choose a display name for your bot (e.g., "My Pi Server").
 5. Choose a unique username. **It must end in 'bot'** (e.g., `nabil_server_bot`).
-6. BotFather will reply with a massive message containing your **HTTP API Token** (it looks like `1234567890:ABCDefGhIjKlMnOpQrStUvWxYz`). Copy this and save it.
+6. BotFather will reply with a massive message containing your **HTTP API Token** (it looks like `1234567890:ABCDefGhIdfgfdlMnOpQrStUvWxYz`). Copy this and save it.
 
 ### 2. Your Telegram User ID
 You need to hardcode your personal ID into the script so the bot ignores commands from strangers.
 1. Open Telegram and search for [**@userinfobot**](https://t.me/userinfobot) (or @getmyid_bot).
 2. Click **Start** or send it any message.
-3. The bot will instantly reply with your `Id` (a 9 or 10-digit number like `1435882929`). 
+3. The bot will instantly reply with your `Id` (a 9 or 10-digit number like `1435246929`). 
 4. Copy this exact number.
 
 ### 3. Gmail App Password (For 2FA)
