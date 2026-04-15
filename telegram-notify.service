@@ -4,7 +4,7 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-WorkingDirectory=/home/redwannabil
+WorkingDirectory=/home/username
 Type=simple
 
 # Send the Boot Alert (The '-' means ignore errors if Wi-Fi is slow to connect)
