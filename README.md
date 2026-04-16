@@ -245,7 +245,48 @@ Then lock it down:
 chmod 600 ~/.backup_secrets
 ```
 
-> **⚠️ Never commit this file to Git.** Your `.gitignore` should exclude it.
+### ☁️ Google Drive Sync (rclone Setup)
+
+To enable the cloud upload portion of the backup, you must configure `rclone` to authenticate with your Google account.
+
+**1) Install rclone**
+```bash
+sudo apt update
+sudo apt install rclone
+```
+
+**2) Configure the Google Drive Remote**
+Run the interactive configuration wizard:
+```bash
+rclone config
+```
+Follow the prompts to set up your connection:
+* Type `n` for a **New remote**.
+* Name the remote: `gdrive` *(Note: If you use a different name, you must update the `RCLONE_REMOTE` variable in `auto_backup.sh`)*.
+* Look at the list of cloud storage providers and type the number for **Google Drive**.
+* Leave `client_id` and `client_secret` blank (press **Enter**).
+* Choose `1` for **Full Access** (`drive`).
+* Leave `root_folder_id` and `service_account_file` blank.
+* Type `n` to skip advanced config.
+* **Authentication:** * If you have a desktop GUI on your Pi, type `y` to use auto-config and log in via the browser.
+  * If your Pi is **headless** (SSH only), type `n`. It will give you a command to run on your main PC to generate an auth token, which you then paste back into the Pi terminal.
+* Type `n` when asked if it is a Shared Drive (unless you are specifically using a Google Workspace Shared Drive).
+* Type `y` to confirm and save.
+* Type `q` to quit the config wizard.
+
+**3) Test the Connection**
+Verify that your Pi can successfully read your Google Drive by listing the top-level directories:
+```bash
+rclone lsd gdrive:
+```
+
+**4) How the Script Uploads**
+Once configured, the `auto_backup.sh` script handles the daily upload automatically using a command similar to this:
+```bash
+# Example of the command used inside the script:
+rclone copy /mnt/usb_backup/pi_backups/FILENAME.img.gz gdrive:pi_backups/
+```
+
 
 ### ♻️ Restore Procedure (Write image to a new SD card)
 
