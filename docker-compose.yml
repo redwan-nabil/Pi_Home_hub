@@ -8,10 +8,10 @@ services:
     volumes:
       - ./database:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=your_strong_root_password
-      - MYSQL_PASSWORD=your_strong_password
-      - MYSQL_DATABASE=nextcloud_db
-      - MYSQL_USER=nextcloud_user
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
 
   app:
     image: nextcloud
@@ -24,7 +24,12 @@ services:
       - ./system:/var/www/html
       - /mnt/usb_backup/nc_data:/var/www/html/data
     environment:
-      - MYSQL_PASSWORD=your_strong_password
-      - MYSQL_DATABASE=nextcloud_db
-      - MYSQL_USER=nextcloud_user
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
       - MYSQL_HOST=db
+
+      # Optional: Only if you want automatic admin creation on first run
+      - NEXTCLOUD_ADMIN_USER=${NEXTCLOUD_ADMIN_USER}
+      - NEXTCLOUD_ADMIN_PASSWORD=${NEXTCLOUD_ADMIN_PASSWORD}
+      
