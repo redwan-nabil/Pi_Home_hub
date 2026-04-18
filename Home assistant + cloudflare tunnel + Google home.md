@@ -1,4 +1,4 @@
-# 🏰 Nexus Hub: The "God-Tier" Home Assistant Architecture
+# 🏰 Nexus Hub: The Home Assistant Architecture
 
 A comprehensive, military-grade guide to securely exposing a local Home Assistant instance to the internet **bypassing CGNAT** (shared ISP IPs) and linking it to **Google Home** without opening any router ports.
 
