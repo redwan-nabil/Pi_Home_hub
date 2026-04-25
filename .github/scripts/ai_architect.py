@@ -1,78 +1,78 @@
 import os
 import shutil
+import sys
 from google import genai
 
-# V3 Setup using the new Google GenAI SDK
 client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
 INCOMING_DIR = "incoming"
+ROOT_DIR = "."
 
 def process_scripts():
     if not os.path.exists(INCOMING_DIR):
         print("No incoming directory found. Exiting.")
         return
 
-    for filename in os.listdir(INCOMING_DIR):
-        filepath = os.path.join(INCOMING_DIR, filename)
+    # Look at the custom folders you typed during the 'publish' command
+    for project_folder in os.listdir(INCOMING_DIR):
+        project_incoming_path = os.path.join(INCOMING_DIR, project_folder)
         
-        if os.path.isfile(filepath):
-            with open(filepath, "r") as f:
-                code = f.read()
+        if os.path.isdir(project_incoming_path):
+            # Create the Master Folder in the root of your repo
+            final_project_path = os.path.join(ROOT_DIR, project_folder)
+            if not os.path.exists(final_project_path):
+                os.makedirs(final_project_path)
 
-            print(f"🤖 AI analyzing: {filename}...")
-            
-            prompt = f"""
-            You are a Senior DevOps Engineer organizing a GitHub portfolio. 
-            I have written this automation script: '{filename}'.
-            
-            Analyze the code and do 3 things:
-            1. Assign it to a Master Category folder (e.g., 'Server_Control_Automation', 'Smart_Home_Hub', 'Network_Security'). Use underscores, no spaces.
-            2. Create a documentation file name that matches the script's purpose.
-            3. Write a highly detailed Markdown documentation file explaining the A-to-Z implementation, installation, and commands.
-            
-            Output STRICTLY in this exact format:
-            CATEGORY: <The_Category_Name>
-            MD_NAME: <The_Doc_Name.md>
-            ===SPLIT===
-            <The raw Markdown text>
-            
-            Here is the code:
-            {code}
-            """
-            
-            try:
-                # Modern API call
-                response = client.models.generate_content(
-                    model='gemini-1.5-flash',
-                    contents=prompt
-                )
+            # Process the scripts inside that folder
+            for filename in os.listdir(project_incoming_path):
+                filepath = os.path.join(project_incoming_path, filename)
                 
-                parts = response.text.split("===SPLIT===")
-                header_data = parts[0].strip().split("\n")
-                readme_content = parts[1].strip()
-                
-                category_name = "Uncategorized_Scripts"
-                md_filename = f"{filename}.md"
-                
-                for line in header_data:
-                    if line.startswith("CATEGORY:"):
-                        category_name = line.replace("CATEGORY:", "").strip()
-                    elif line.startswith("MD_NAME:"):
-                        md_filename = line.replace("MD_NAME:", "").strip()
-                
-                if not os.path.exists(category_name):
-                    os.makedirs(category_name)
-                
-                new_script_path = os.path.join(category_name, filename)
-                shutil.move(filepath, new_script_path)
-                
-                with open(os.path.join(category_name, md_filename), "w") as f:
-                    f.write(readme_content)
+                if os.path.isfile(filepath):
+                    with open(filepath, "r") as f:
+                        code = f.read()
+
+                    print(f"🤖 AI writing documentation for: {filename}...")
                     
-                print(f"✅ Successfully sorted '{filename}' into '{category_name}/{md_filename}'")
-                
-            except Exception as e:
-                print(f"❌ Failed to parse AI output for {filename}: {e}")
+                    # The prompt is now much simpler, making it crash-proof!
+                    prompt = f"""
+                    You are a Senior DevOps Engineer. I am adding a script named '{filename}' to my portfolio folder '{project_folder}'.
+                    Analyze the code and write a highly detailed, professional README explaining how it works, installation, and usage.
+                    Output ONLY the raw Markdown text. Do not include extra conversational text.
+                    Code:
+                    {code}
+                    """
+                    
+                    try:
+                        response = client.models.generate_content(
+                            model='gemini-1.5-flash',
+                            contents=prompt
+                        )
+                        
+                        # Clean up formatting
+                        readme_content = response.text.strip()
+                        if readme_content.startswith("```markdown"):
+                            readme_content = readme_content[11:-3].strip()
+                        elif readme_content.startswith("```"):
+                            readme_content = readme_content[3:-3].strip()
+                        
+                        # Format the MD file name (e.g. auto_backup.sh -> auto_backup.md)
+                        base_name = os.path.splitext(filename)[0]
+                        md_filename = f"{base_name}.md"
+                        
+                        # Move the code and save the new Markdown file!
+                        shutil.move(filepath, os.path.join(final_project_path, filename))
+                        
+                        with open(os.path.join(final_project_path, md_filename), "w") as f:
+                            f.write(readme_content)
+                            
+                        print(f"✅ Success! Saved {filename} and {md_filename} to /{project_folder}")
+                        
+                    except Exception as e:
+                        print(f"❌ Failed AI generation for {filename}: {e}")
+                        sys.exit(1) # This forces GitHub to show a Red X if the AI crashes!
+
+            # Clean up the empty staging folder
+            shutil.rmtree(project_incoming_path, ignore_errors=True)
 
 if __name__ == "__main__":
     process_scripts()
