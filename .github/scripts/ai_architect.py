@@ -1,9 +1,9 @@
 import os
 import shutil
-import google.generativeai as genai
+from google import genai
 
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-model = genai.GenerativeModel('gemini-1.5-flash-latest')
+# V3 Setup using the new Google GenAI SDK
+client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
 INCOMING_DIR = "incoming"
 
@@ -27,7 +27,7 @@ def process_scripts():
             
             Analyze the code and do 3 things:
             1. Assign it to a Master Category folder (e.g., 'Server_Control_Automation', 'Smart_Home_Hub', 'Network_Security'). Use underscores, no spaces.
-            2. Create a documentation file name that matches the script's purpose (e.g., if the script is master_backup.sh, the doc should be 'master_backup.md').
+            2. Create a documentation file name that matches the script's purpose.
             3. Write a highly detailed Markdown documentation file explaining the A-to-Z implementation, installation, and commands.
             
             Output STRICTLY in this exact format:
@@ -40,11 +40,14 @@ def process_scripts():
             {code}
             """
             
-            response = model.generate_content(prompt).text
-            
             try:
-                # Parse AI instructions
-                parts = response.split("===SPLIT===")
+                # Modern API call
+                response = client.models.generate_content(
+                    model='gemini-1.5-flash',
+                    contents=prompt
+                )
+                
+                parts = response.text.split("===SPLIT===")
                 header_data = parts[0].strip().split("\n")
                 readme_content = parts[1].strip()
                 
@@ -57,15 +60,12 @@ def process_scripts():
                     elif line.startswith("MD_NAME:"):
                         md_filename = line.replace("MD_NAME:", "").strip()
                 
-                # Create Category Folder if it doesn't exist yet
                 if not os.path.exists(category_name):
                     os.makedirs(category_name)
                 
-                # Move the script into the Category Folder
                 new_script_path = os.path.join(category_name, filename)
                 shutil.move(filepath, new_script_path)
                 
-                # Write the specific .md documentation file next to it
                 with open(os.path.join(category_name, md_filename), "w") as f:
                     f.write(readme_content)
                     

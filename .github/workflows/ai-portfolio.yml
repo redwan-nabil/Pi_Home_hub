@@ -21,7 +21,7 @@ jobs:
           python-version: '3.10'
 
       - name: Install AI Dependencies
-        run: pip install google-generativeai
+        run: pip install google-genai
 
       - name: Run AI Architect
         env:
